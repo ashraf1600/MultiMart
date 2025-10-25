@@ -60,6 +60,38 @@ table > tbody > tr > td{
 .payment-method [type=radio]:checked + img{
     outline: 2px solid #ff0000;
 }
+.login-option {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px; /* equal space between items */
+}
+
+.login-option a {
+    font-size: 14px;
+    text-decoration: none;
+    color: #333;
+}
+
+.login-option a.btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+}
+
+.login-option .get-start-btn {
+    background-color: #d9534f;
+    color: white !important;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.login-option .get-start-btn:hover {
+    background-color: #b52b27;
+    color: white !important;
+}
+
 
 @media only screen and (max-width: 480px) {
     a.get-start-btn{
