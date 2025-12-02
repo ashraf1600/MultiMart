@@ -18,7 +18,7 @@
                 <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
                     <div class="user-dashboard loader-holder">
                         <div class="user-holder">
-                            <h5 class="text-uppercase">Build Your Food Menu</h5>
+                            <h5 class="text-uppercase">Build Your Product Menu</h5>
 							<hr>
                             <button class="btn btn-secondary" onclick="history.back()"><i class="fa fa-angle-left" aria-hidden="true"></i> Back</button>
                             <br><br>
@@ -50,9 +50,9 @@
                                 </tbody>
                               </table>
                             {% else %}
-                              <h5 class="text-center">No food items found.</h5>
+                              <h5 class="text-center">No  Products found.</h5>
                               <div class="text-center">
-                                  <a href="{% url 'add_food' %}" class="btn btn-success"><i class="fa fa-plus" aria-hidden="true"></i> &nbsp; Add Food</a>
+                                  <a href="{% url 'add_food' %}" class="btn btn-success"><i class="fa fa-plus" aria-hidden="true"></i> &nbsp; Add Product </a>
                               </div>
 
                             {% endif %}

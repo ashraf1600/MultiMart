@@ -167,3 +167,10 @@ EMAIL_USE_TLS = True
 
 DEFAULT_FROM_EMAIL = 'FoodOnline Marketplace <ashrafdcc1502@gmail.com>'
 
+
+
+
+
+
+
+
