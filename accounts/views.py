@@ -171,6 +171,8 @@ def myAccount(request):
 @user_passes_test(check_role_customer)
 def custDashboard(request):
     return render(request ,'accounts/custDashboard.html' )
+
+
 @login_required(login_url='login')
 @user_passes_test(check_role_vendor)
 def vendorDashboard(request):

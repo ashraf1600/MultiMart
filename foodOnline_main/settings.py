@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'vendor',
     'menu',
-    'marketplace'
+    'marketplace',
+    'customers',
 ]
 
 MIDDLEWARE = [
