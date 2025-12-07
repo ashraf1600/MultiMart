@@ -453,7 +453,7 @@ def checkout(request):
         'email': request.user.email,
         'address': user_profile.address,
         'country': user_profile.country,
-        'devision': user_profile.state,
+        'devision': user_profile.devision,
         'city': user_profile.city,
         'pin_code': user_profile.pin_code,
     }
