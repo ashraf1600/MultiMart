@@ -8,6 +8,7 @@ urlpatterns = [
 
     path('', views.marketplace , name='marketplace'),
     path('<slug:vendor_slug>/', views.vendor_detail , name='vendor_detail'),
+    path('<slug:vendor_slug>/filter/', views.filter_foods , name='filter_foods'),
   
 
     

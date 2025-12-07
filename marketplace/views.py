@@ -2,14 +2,14 @@ from django.shortcuts import render , redirect
 from vendor.models import Vendor , OpeningHour
 from django.shortcuts import get_object_or_404
 from menu.models import Category , FoodItem
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q, Min, Max
 from django.http import HttpResponse
 from django.http import JsonResponse
 from .models import Cart
 from .context_processors import get_cart_counter, get_cart_amounts
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from datetime import date , datetime
+from decimal import Decimal
 # from django.contrib.gis.geos import GEOSGeometry
 # Create your views here.
 
@@ -42,33 +42,28 @@ def vendor_detail(request, vendor_slug):
     today = today_date.isoweekday()
 
     current_opening_hours = OpeningHour.objects.filter( vendor = vendor , day = today)
-    # now = datetime.now()
-    # current_time = now.strftime("%H:%M:%S")
-    # is_open = None
-
-    # for i in current_opening_hours:
-    #     start = str(datetime.strptime(i.from_hour , "%I:%M %p").time())
-    #     end =str(datetime.strptime(i.to_hour, "%I:%M %p").time())
-    #     if current_time > start and current_time < end :
-    #         is_open = True
-    #     else :
-    #         is_open = False    
+    
+    # Get price range for filters
+    price_data = FoodItem.objects.filter(vendor=vendor, is_available=True).aggregate(
+        min_price=Min('price'),
+        max_price=Max('price')
+    )
+    min_price = price_data['min_price'] or 0
+    max_price = price_data['max_price'] or 0
 
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
     else:
         cart_items = None
         
-
-
-
-    
     context = {
         'vendor': vendor,
         'categories': categories,
         'cart_items': cart_items,
         'opening_hours': opening_hours,
         'current_opening_hours': current_opening_hours,
+        'min_price': min_price,
+        'max_price': max_price,
     }
     return render(request, 'marketplace/vendor_detail.html', context)   
 
@@ -152,6 +147,72 @@ def delete_cart(request, cart_id):
         else:
             return JsonResponse({'status': 'Failed', 'message': 'Invalid request!'})
         
+
+
+@login_required(login_url='login')
+def filter_foods(request, vendor_slug):
+    """Filter foods by category, price, and search query"""
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        vendor = get_object_or_404(Vendor, vendor_slug=vendor_slug, is_approved=True, user__is_active=True)
+        
+        # Get filter parameters
+        search_query = request.GET.get('search', '').strip()
+        category_id = request.GET.get('category', '')
+        min_price = request.GET.get('min_price', '')
+        max_price = request.GET.get('max_price', '')
+        
+        # Start with all available food items for this vendor
+        foods = FoodItem.objects.filter(vendor=vendor, is_available=True)
+        
+        # Filter by category
+        if category_id and category_id != '':
+            foods = foods.filter(category_id=category_id)
+        
+        # Filter by search query (food title and description)
+        if search_query:
+            foods = foods.filter(
+                Q(food_title__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
+        
+        # Filter by price range
+        if min_price:
+            try:
+                foods = foods.filter(price__gte=Decimal(min_price))
+            except:
+                pass
+        
+        if max_price:
+            try:
+                foods = foods.filter(price__lte=Decimal(max_price))
+            except:
+                pass
+        
+        # Get cart items for display
+        if request.user.is_authenticated:
+            cart_items = Cart.objects.filter(user=request.user).values_list('fooditem_id', flat=True)
+        else:
+            cart_items = []
+        
+        # Prepare response data
+        foods_data = []
+        for food in foods:
+            foods_data.append({
+                'id': food.id,
+                'title': food.food_title,
+                'price': str(food.price),
+                'description': food.description,
+                'image': food.image.url,
+                'in_cart': food.id in cart_items,
+            })
+        
+        return JsonResponse({
+            'status': 'success',
+            'foods': foods_data,
+            'count': foods.count()
+        })
+    
+    return JsonResponse({'status': 'failed', 'message': 'Invalid request'})
 
 
 def search(request):

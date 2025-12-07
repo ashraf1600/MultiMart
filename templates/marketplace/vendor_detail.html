@@ -70,20 +70,63 @@
                 <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12 sticky-sidebar">
                     
                     <div class="filter-wrapper">
-                        <div class="categories-menu">
-                            <h6><i class=""></i> All Categories</h6>
-                            <ul class="menu-list">
+                        <!-- Search Filter -->
+                        <div class="search-filter" style="margin-bottom: 25px;">
+                            <h6><i class="icon-search"></i> Search Products</h6>
+                            <input type="text" id="search-products" class="form-control" placeholder="Search by name or description..." style="margin-top: 10px;">
+                        </div>
+
+                        <!-- Categories Filter -->
+                        <div class="categories-menu" style="margin-bottom: 25px; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px;">
+                            <h6><i class="icon-list"></i> Categories</h6>
+                            <ul class="menu-list" style="list-style: none; padding-left: 0;">
+                                <li style="margin-bottom: 8px;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="radio" name="category" value="" checked style="margin-right: 8px;"> 
+                                        <span>All Categories</span>
+                                    </label>
+                                </li>
                                 {% for category in categories %}
-                                <li class="active"><a href="#" class="menu-category-link"> {{ category }} </a></li>
+                                <li style="margin-bottom: 8px;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="radio" name="category" value="{{ category.id }}" style="margin-right: 8px;"> 
+                                        <span>{{ category }}</span>
+                                    </label>
+                                </li>
                                 {% endfor %}
                             </ul>
                         </div>
+
+                        <!-- Price Filter -->
+                        <div class="price-filter" style="margin-bottom: 25px; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px;">
+                            <h6><i class="icon-price-tag"></i> Price Range</h6>
+                            <div style="margin-top: 10px;">
+                                <div style="margin-bottom: 12px;">
+                                    <label style="display: block; font-size: 12px; margin-bottom: 5px;">Min Price: <span id="min-price-label">{{ min_price }}</span> BDT</label>
+                                    <input type="range" id="min-price" min="{{ min_price }}" max="{{ max_price }}" value="{{ min_price }}" class="form-control-range" style="width: 100%;">
+                                </div>
+                                <div style="margin-bottom: 12px;">
+                                    <label style="display: block; font-size: 12px; margin-bottom: 5px;">Max Price: <span id="max-price-label">{{ max_price }}</span> BDT</label>
+                                    <input type="range" id="max-price" min="{{ min_price }}" max="{{ max_price }}" value="{{ max_price }}" class="form-control-range" style="width: 100%;">
+                                </div>
+                                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                                    <input type="text" id="min-price-input" class="form-control" placeholder="Min" value="{{ min_price }}" style="width: 48%;">
+                                    <span style="display: flex; align-items: center; padding: 0 5px;">-</span>
+                                    <input type="text" id="max-price-input" class="form-control" placeholder="Max" value="{{ max_price }}" style="width: 48%;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reset Filters -->
+                        <button id="reset-filters" class="btn btn-outline-danger" style="width: 100%; margin-bottom: 10px;">
+                            <i class="icon-reload"></i> Reset Filters
+                        </button>
                     </div>
                 </div>
                 <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12">
                     <div class="tabs-holder horizontal">
                         <ul class="stickynav-tabs nav nav-tabs">
-                            <li class="active"><a data-toggle="tab" href="#home"><i class="icon- icon-room_service"></i>Porducts</a></li>
+                            <li class="active"><a data-toggle="tab" href="#home"><i class="icon- icon-room_service"></i>Products (<span id="product-count">0</span>)</a></li>
                             
                         </ul>
                         <div class="tab-content">
@@ -93,13 +136,13 @@
                                     <div id="menu-item-list-6272" class="menu-itam-list">
                                         
                                         {% for category in categories %}
-                                        <div class="element-title" id="menu-category-2">
+                                        <div class="element-title category-section" data-category-id="{{ category.id }}" id="menu-category-{{ category.id }}">
                                             <h5 class="text-color">{{ category }}</h5>
                                             <span>{{ category.description }}</span>
                                         </div>
-                                        <ul>
+                                        <ul class="food-items-list" data-category-id="{{ category.id }}">
                                             {% for food in category.fooditems.all %}
-                                            <li>
+                                            <li class="food-item" data-food-id="{{ food.id }}" data-price="{{ food.price }}" data-title="{{ food.food_title }}">
                                                 <div class="image-holder"> <img src="{{ food.image.url }}" alt=""></div>
                                                 <div class="text-holder">
                                                     <h6>{{ food }}</h6>
@@ -128,6 +171,11 @@
                                     
 
                                     {% endfor %}
+
+                                    <!-- No Results Message -->
+                                    <div id="no-results" class="alert alert-info text-center" style="display: none; margin-top: 20px;">
+                                        <p>No products found matching your filters.</p>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -140,5 +188,7 @@
     </div>
 </div>
 <!-- Main Section End -->
+
+<script src="{% static 'js/vendor_filter.js' %}"></script>
 
 {% endblock %}
