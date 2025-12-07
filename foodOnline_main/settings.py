@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
-
-
+import os
+from django import conf
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'menu',
     'marketplace',
     'customers',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -169,6 +170,21 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'FoodOnline Marketplace <ashrafdcc1502@gmail.com>'
 
 
+
+
+GOOGLE_API_KEY = config('GOOGLE_API_KEY', default='dummy-google-api-key')
+
+if DEBUG == True:
+    os.environ['PATH'] = os.path.join(BASE_DIR, 'env\Lib\site-packages\osgeo') + ';' + os.environ['PATH']
+    os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, 'env\Lib\site-packages\osgeo\data\proj') + ';' + os.environ['PATH']
+    GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'env\Lib\site-packages\osgeo\gdal304.dll')
+
+PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID', default='dummy-paypal-client-id')
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
+RZP_KEY_ID = config('RZP_KEY_ID', default='dummy-razorpay-key-id')
+RZP_KEY_SECRET = config('RZP_KEY_SECRET', default='dummy-razorpay-key-secret')
 
 
 
