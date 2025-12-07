@@ -60,13 +60,28 @@ def vendor_detail(request, vendor_slug):
     else:
         cart_items = None
     
-    # If search query provided, filter foods across all categories
+    # Get category filter from GET parameter
+    category_id = request.GET.get('category', '').strip()
+    selected_category = None
     filtered_foods = None
+    
+    # If search query provided, filter foods across all categories
     if search_query:
         filtered_foods = FoodItem.objects.filter(
             Q(vendor=vendor, is_available=True, food_title__icontains=search_query) | 
             Q(vendor=vendor, is_available=True, description__icontains=search_query)
         )
+    # If category filter provided, filter foods by category
+    elif category_id:
+        try:
+            selected_category = Category.objects.get(id=category_id, vendor=vendor)
+            filtered_foods = FoodItem.objects.filter(
+                vendor=vendor, 
+                is_available=True, 
+                category=selected_category
+            )
+        except Category.DoesNotExist:
+            filtered_foods = None
         
     context = {
         'vendor': vendor,
@@ -78,6 +93,7 @@ def vendor_detail(request, vendor_slug):
         'max_price': max_price,
         'search_query': search_query,
         'filtered_foods': filtered_foods,
+        'selected_category': selected_category,
     }
     return render(request, 'marketplace/vendor_detail.html', context)   
 

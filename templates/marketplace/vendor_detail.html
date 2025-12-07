@@ -86,6 +86,21 @@
                             </form>
                         </div>
 
+                        <!-- Search by Category Filter -->
+                        <div class="category-search-filter" style="margin-bottom: 25px;">
+                            <h6><i class="icon-list"></i> Filter by Category</h6>
+                            <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+                                <a href="{% url 'vendor_detail' vendor.vendor_slug %}" class="btn btn-outline-primary" style="padding: 8px 12px; text-align: center; text-decoration: none; font-size: 13px;">
+                                    All Categories
+                                </a>
+                                {% for category in categories %}
+                                <a href="{% url 'vendor_detail' vendor.vendor_slug %}?category={{ category.id }}" class="btn btn-outline-secondary" style="padding: 8px 12px; text-align: center; text-decoration: none; font-size: 13px;">
+                                    {{ category }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+
                         <!-- Categories Filter -->
                         <div class="categories-menu" style="margin-bottom: 25px; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px;">
                             <h6><i class="icon-list"></i> Categories</h6>
@@ -142,6 +157,8 @@
                                     Products 
                                     {% if search_query %}
                                     - "{{ search_query }}" 
+                                    {% elif selected_category %}
+                                    - "{{ selected_category }}"
                                     {% endif %}
                                     (<span id="product-count">
                                     {% if filtered_foods %}
@@ -159,12 +176,18 @@
                                     <div id="menu-item-list-6272" class="menu-itam-list">
                                         
                                         {% if filtered_foods %}
-                                            <!-- Show search results -->
-                                            {% if filtered_foods %}
+                                            <!-- Show search or category results -->
+                                            {% if search_query %}
                                             <div class="element-title" style="margin-bottom: 20px;">
                                                 <h5 class="text-color">Search Results</h5>
-                                                <span>Found {{ filtered_foods.count }} product(s)</span>
+                                                <span>Found {{ filtered_foods.count }} product(s) for "{{ search_query }}"</span>
                                             </div>
+                                            {% elif selected_category %}
+                                            <div class="element-title" style="margin-bottom: 20px;">
+                                                <h5 class="text-color">{{ selected_category }}</h5>
+                                                <span>{{ selected_category.description }}</span>
+                                            </div>
+                                            {% endif %}
                                             <ul class="food-items-list">
                                                 {% for food in filtered_foods %}
                                                 <li class="food-item" data-food-id="{{ food.id }}" data-price="{{ food.price }}" data-title="{{ food.food_title }}">
@@ -182,12 +205,6 @@
                                                 </li>
                                                 {% endfor %}
                                             </ul>
-                                            {% else %}
-                                            <div class="alert alert-info text-center" style="margin: 30px 0; padding: 30px;">
-                                                <h5>No Products Found</h5>
-                                                <p>No products match your search "{{ search_query }}"</p>
-                                            </div>
-                                            {% endif %}
                                         {% else %}
                                             <!-- Show all products by category -->
                                             {% for category in categories %}
