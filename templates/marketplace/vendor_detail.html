@@ -73,7 +73,17 @@
                         <!-- Search Filter -->
                         <div class="search-filter" style="margin-bottom: 25px;">
                             <h6><i class="icon-search"></i> Search Products</h6>
-                            <input type="text" id="search-products" class="form-control" placeholder="Search by name or description..." style="margin-top: 10px;">
+                            <form method="GET" style="display: flex; gap: 8px; margin-top: 10px;">
+                                <input type="text" name="search" class="form-control" placeholder="Search by name or description..." value="{{ search_query }}" style="flex: 1;">
+                                <button type="submit" class="btn btn-outline-danger" style="padding: 8px 15px; white-space: nowrap;">
+                                    <i class="icon-search"></i> Search
+                                </button>
+                                {% if search_query %}
+                                <a href="{% url 'vendor_detail' vendor.vendor_slug %}" class="btn btn-outline-secondary" style="padding: 8px 15px; white-space: nowrap;">
+                                    Clear
+                                </a>
+                                {% endif %}
+                            </form>
                         </div>
 
                         <!-- Categories Filter -->
@@ -126,41 +136,84 @@
                 <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12">
                     <div class="tabs-holder horizontal">
                         <ul class="stickynav-tabs nav nav-tabs">
-                            <li class="active"><a data-toggle="tab" href="#home"><i class="icon- icon-room_service"></i>Products (<span id="product-count">0</span>)</a></li>
-                            
+                            <li class="active">
+                                <a data-toggle="tab" href="#home">
+                                    <i class="icon- icon-room_service"></i>
+                                    Products 
+                                    {% if search_query %}
+                                    - "{{ search_query }}" 
+                                    {% endif %}
+                                    (<span id="product-count">
+                                    {% if filtered_foods %}
+                                        {{ filtered_foods.count }}
+                                    {% else %}
+                                        {% with total_products=categories|dictsort:"id"|first %}0{% endwith %}
+                                    {% endif %}
+                                    </span>)
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content">
                             <div id="home" class="tab-pane in active">
                                 <div class="menu-itam-holder">
-                                    
                                     <div id="menu-item-list-6272" class="menu-itam-list">
                                         
-                                        {% for category in categories %}
-                                        <div class="element-title category-section" data-category-id="{{ category.id }}" id="menu-category-{{ category.id }}">
-                                            <h5 class="text-color">{{ category }}</h5>
-                                            <span>{{ category.description }}</span>
-                                        </div>
-                                        <ul class="food-items-list" data-category-id="{{ category.id }}">
-                                            {% for food in category.fooditems.all %}
-                                            <li class="food-item" data-food-id="{{ food.id }}" data-price="{{ food.price }}" data-title="{{ food.food_title }}">
-                                                <div class="image-holder"> <img src="{{ food.image.url }}" alt=""></div>
-                                                <div class="text-holder">
-                                                    <h6>{{ food }}</h6>
-                                                    <span>{{ food.description }}</span>
-                                                </div>
-                                                <div class="price-holder">
-                                                    <span class="price">{{ food.price }} Bdt </span>
-
-                                                    <a href="#" class="decrease_cart" data-id="{{ food.id }}" data-url="{% url 'decrease_cart' food.id %}  " style="margin-right: 28px;"><i class="icon-minus text-color"></i></a>
-                                                    <label id="qty-{{food.id}}">0</label>
-                                                    <a href="#" class="add_to_cart" data-id="{{ food.id }}" data-url="{% url 'add_to_cart' food.id %}"><i class="icon-plus4 text-color"></i></a>
-                                                    
-                                                </div>
-                                            </li>
+                                        {% if filtered_foods %}
+                                            <!-- Show search results -->
+                                            {% if filtered_foods %}
+                                            <div class="element-title" style="margin-bottom: 20px;">
+                                                <h5 class="text-color">Search Results</h5>
+                                                <span>Found {{ filtered_foods.count }} product(s)</span>
+                                            </div>
+                                            <ul class="food-items-list">
+                                                {% for food in filtered_foods %}
+                                                <li class="food-item" data-food-id="{{ food.id }}" data-price="{{ food.price }}" data-title="{{ food.food_title }}">
+                                                    <div class="image-holder"> <img src="{{ food.image.url }}" alt=""></div>
+                                                    <div class="text-holder">
+                                                        <h6>{{ food }}</h6>
+                                                        <span>{{ food.description }}</span>
+                                                    </div>
+                                                    <div class="price-holder">
+                                                        <span class="price">{{ food.price }} Bdt </span>
+                                                        <a href="#" class="decrease_cart" data-id="{{ food.id }}" data-url="{% url 'decrease_cart' food.id %}" style="margin-right: 28px;"><i class="icon-minus text-color"></i></a>
+                                                        <label id="qty-{{food.id}}">0</label>
+                                                        <a href="#" class="add_to_cart" data-id="{{ food.id }}" data-url="{% url 'add_to_cart' food.id %}"><i class="icon-plus4 text-color"></i></a>
+                                                    </div>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% else %}
+                                            <div class="alert alert-info text-center" style="margin: 30px 0; padding: 30px;">
+                                                <h5>No Products Found</h5>
+                                                <p>No products match your search "{{ search_query }}"</p>
+                                            </div>
+                                            {% endif %}
+                                        {% else %}
+                                            <!-- Show all products by category -->
+                                            {% for category in categories %}
+                                            <div class="element-title category-section" data-category-id="{{ category.id }}" id="menu-category-{{ category.id }}">
+                                                <h5 class="text-color">{{ category }}</h5>
+                                                <span>{{ category.description }}</span>
+                                            </div>
+                                            <ul class="food-items-list" data-category-id="{{ category.id }}">
+                                                {% for food in category.fooditems.all %}
+                                                <li class="food-item" data-food-id="{{ food.id }}" data-price="{{ food.price }}" data-title="{{ food.food_title }}">
+                                                    <div class="image-holder"> <img src="{{ food.image.url }}" alt=""></div>
+                                                    <div class="text-holder">
+                                                        <h6>{{ food }}</h6>
+                                                        <span>{{ food.description }}</span>
+                                                    </div>
+                                                    <div class="price-holder">
+                                                        <span class="price">{{ food.price }} Bdt </span>
+                                                        <a href="#" class="decrease_cart" data-id="{{ food.id }}" data-url="{% url 'decrease_cart' food.id %}" style="margin-right: 28px;"><i class="icon-minus text-color"></i></a>
+                                                        <label id="qty-{{food.id}}">0</label>
+                                                        <a href="#" class="add_to_cart" data-id="{{ food.id }}" data-url="{% url 'add_to_cart' food.id %}"><i class="icon-plus4 text-color"></i></a>
+                                                    </div>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
                                             {% endfor %}
-                                            
-                                        </ul>
-                                        {% endfor %}
+                                        {% endif %}
                                         
                                     </div>
 

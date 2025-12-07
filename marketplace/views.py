@@ -32,6 +32,10 @@ def marketplace(request):
 def vendor_detail(request, vendor_slug):
     vendor = get_object_or_404(Vendor, vendor_slug=vendor_slug, is_approved=True, user__is_active=True)
     
+    # Get search query if provided
+    search_query = request.GET.get('search', '').strip()
+    
+    # Get all categories for the vendor
     categories = Category.objects.filter(vendor=vendor).prefetch_related(
         Prefetch('fooditems', queryset=FoodItem.objects.filter(is_available=True))
     )
@@ -55,6 +59,14 @@ def vendor_detail(request, vendor_slug):
         cart_items = Cart.objects.filter(user=request.user)
     else:
         cart_items = None
+    
+    # If search query provided, filter foods across all categories
+    filtered_foods = None
+    if search_query:
+        filtered_foods = FoodItem.objects.filter(
+            Q(vendor=vendor, is_available=True, food_title__icontains=search_query) | 
+            Q(vendor=vendor, is_available=True, description__icontains=search_query)
+        )
         
     context = {
         'vendor': vendor,
@@ -64,6 +76,8 @@ def vendor_detail(request, vendor_slug):
         'current_opening_hours': current_opening_hours,
         'min_price': min_price,
         'max_price': max_price,
+        'search_query': search_query,
+        'filtered_foods': filtered_foods,
     }
     return render(request, 'marketplace/vendor_detail.html', context)   
 
