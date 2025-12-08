@@ -96,19 +96,22 @@
 
                                             
                                                 {% for item in cart_items %}
-                                                <li id="cart-item-{{item.id}}">
-                                                    <div class="image-holder"> <img src="{{ item.fooditem.image.url }}" alt=""></div>
-                                                    <div class="text-holder">
-                                                        <h6>{{ item.fooditem }}</h6>
-                                                        <span>{{ item.fooditem.description }}</span>
-                                                        <a href="{% url 'vendor_detail' item.fooditem.vendor.vendor_slug %}" class="badge badge-warning">{{ item.fooditem.vendor }}</a>
+                                                <li id="cart-item-{{item.id}}" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; gap: 15px;">
+                                                    <div class="image-holder" style="flex-shrink: 0;"> 
+                                                        <img src="{{ item.fooditem.image.url }}" alt="" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                                    </div>
+                                                    <div class="text-holder" style="flex: 1; min-width: 0;">
+                                                        <h6 style="margin-bottom: 4px;">{{ item.fooditem }}</h6>
+                                                        <span style="font-size: 12px; color: #666;">{{ item.fooditem.description }}</span>
+                                                        <br>
+                                                        <a href="{% url 'vendor_detail' item.fooditem.vendor.vendor_slug %}" class="badge badge-warning" style="margin-top: 4px; display: inline-block;">{{ item.fooditem.vendor }}</a>
                                                     </div>
 
-                                                    <div class="quantity" style="display: inline-block; position: absolute; top: 50%; transform: translateY(-50%); margin-top: -10px;">
-                                                        <span>{{ item.quantity }} QTY</span>
+                                                    <div class="quantity" style="flex-shrink: 0; text-align: center; min-width: 80px;">
+                                                        <span style="font-weight: 600; font-size: 14px;">{{ item.quantity }}&nbsp;<small style="font-weight: normal;">QTY</small></span>
                                                     </div>
-                                                    <div class="price-holder">
-                                                        <span class="price">${{ item.fooditem.price }}</span>
+                                                    <div class="price-holder" style="flex-shrink: 0; text-align: right; min-width: 100px;">
+                                                        <span class="price" style="font-weight: 600; font-size: 14px;">BDT&nbsp;{{ item.fooditem.price }}</span>
                                                     </div>
                                                 </li>
                                                 {% endfor %}
@@ -124,7 +127,7 @@
                                             <li style="list-style-type: none;">
                                                 Subtotal
                                                 <span class="price float-right">
-                                                    <span class="currency">$</span>
+                                                    <span class="currency">BDT</span>
                                                     <span id="subtotal">{{ subtotal }}</span>
                                                 </span>
                                             </li>
@@ -134,7 +137,7 @@
                                                     <li style="list-style-type: none;">
                                                         {{ key }} <small>({{ i }}%)</small>
                                                         <span class="price float-right">
-                                                            <span class="currency">$</span>
+                                                            <span class="currency">BDT </span>
                                                             <span id="tax-{{ key }}">{{ j }}</span>
                                                         </span>
                                                     </li>
@@ -145,7 +148,7 @@
                                             <li style="list-style-type: none; font-weight: 600;">
                                                 TOTAL
                                                 <span class="price float-right">
-                                                    <span class="currency">$</span>
+                                                    <span class="currency">BDT</span>
                                                     <span id="total">{{ grand_total }}</span>
                                                 </span>
                                             </li>
@@ -153,15 +156,16 @@
                                             <!-- Select payment method -->
                                             <h5>SELECT PAYMENT METHOD</h5>
                                             <div class="payment-method">
+                                                  <label>
+                                                    <input type="radio" name="payment_method" value="RazorPay">
+                                                    <img src="{% static 'images/Bkash-logo.png' %}" alt="RazorPay" width="100">
+                                                </label>
                                                 <label>
                                                     <input type="radio" name="payment_method" value="PayPal">
                                                     <img src="{% static 'images/PayPal.png' %}" alt="PayPal" width="100">
                                                 </label>
                                                 &emsp;
-                                                <label>
-                                                    <input type="radio" name="payment_method" value="RazorPay">
-                                                    <img src="{% static 'images/razorpay_logo.png' %}" alt="RazorPay" width="100">
-                                                </label>
+                                              
                                             </div>
                                             <span class="text-danger" id="payment-method-error"></span>
                                             <!-- Select payment method -->
