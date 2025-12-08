@@ -76,7 +76,7 @@ def place_order(request):
             order.email = form.cleaned_data['email']
             order.address = form.cleaned_data['address']
             order.country = form.cleaned_data['country']
-            order.state = form.cleaned_data['state']
+            order.devision = form.cleaned_data['devision']
             order.city = form.cleaned_data['city']
             order.pin_code = form.cleaned_data['pin_code']
             order.user = request.user
@@ -90,27 +90,27 @@ def place_order(request):
             order.vendors.add(*vendors_ids)
             order.save()
 
-            # RazorPay Payment
-            DATA = {
-                "amount": float(order.total) * 100,
-                "currency": "INR",
-                "receipt": "receipt #"+order.order_number,
-                "notes": {
-                    "key1": "value3",
-                    "key2": "value2"
-                }
-            }
-            rzp_order = client.order.create(data=DATA)
-            rzp_order_id = rzp_order['id']
+            # # RazorPay Payment
+            # DATA = {
+            #     "amount": float(order.total) * 100,
+            #     "currency": "INR",
+            #     "receipt": "receipt #"+order.order_number,
+            #     "notes": {
+            #         "key1": "value3",
+            #         "key2": "value2"
+            #     }
+            # }
+            # rzp_order = client.order.create(data=DATA)
+            # rzp_order_id = rzp_order['id']
 
-            context = {
-                'order': order,
-                'cart_items': cart_items,
-                'rzp_order_id': rzp_order_id,
-                'RZP_KEY_ID': RZP_KEY_ID,
-                'rzp_amount': float(order.total) * 100,
-            }
-            return render(request, 'orders/place_order.html', context)
+            # context = {
+            #     'order': order,
+            #     'cart_items': cart_items,
+            #     'rzp_order_id': rzp_order_id,
+            #     'RZP_KEY_ID': RZP_KEY_ID,
+            #     'rzp_amount': float(order.total) * 100,
+            # }
+            # return render(request, 'orders/place_order.html', context)
 
         else:
             print(form.errors)
